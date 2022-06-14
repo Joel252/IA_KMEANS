@@ -1,0 +1,140 @@
+
+<!DOCTYPE html>
+<meta charset="utf-8" />
+
+<!-- Cargar libreria d3.js -->
+<script src="https://d3js.org/d3.v6.js"></script>
+
+<!-- Crear div donde se mostrar� la gr�fica -->
+<div id="my_dataviz"></div>
+
+<script> 
+// set the dimensions and margins of the graph
+  const margin = { top: 0, right: 30, bottom: 150, left: 60 },
+    width = 1800 - margin.left - margin.right,
+    height = 1000 - margin.top - margin.bottom;
+
+  // append the svg object to the body of the page
+  const svg = d3
+    .select("#my_dataviz")
+    .append("svg")
+    .attr("viewBox", [0, 0, width + 90, height + 80])
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  // Read dummy data
+  let data = {"nodes": [{"order": "Actinobacteria", "name": "Bifidobacteriales", "group": 0}, {"order": "Actinobacteria", "name": "Micrococcales", "group": 1}, {"order": "Actinobacteria", "name": "Streptomycetales", "group": 2}, {"order": "Actinobacteria", "name": "Micromonosporales", "group": 3}, {"order": "Actinobacteria", "name": "Pseudonocardiales", "group": 4}, {"order": "Actinobacteria", "name": "Propionibacteriales", "group": 5}, {"order": "Actinobacteria", "name": "Actinomycetales", "group": 6}, {"order": "Aeromonadales", "name": "Aeromonadaceae", "group": 7}, {"order": "Alteromonadales", "name": "Pseudoalteromonadaceae", "group": 8}, {"order": "Alteromonadales", "name": "Alteromonadaceae", "group": 9}, {"order": "Alteromonadales", "name": "Shewanellaceae", "group": 10}, {"order": "Aquificales", "name": "Aquificaceae", "group": 11}, {"order": "Bacteroidetes", "name": "Flavobacteriia", "group": 12}, {"order": "Bacteroidetes", "name": "Bacteroidia", "group": 13}, {"order": "Bacteroidetes", "name": "Cytophagia", "group": 14}, {"order": "Bacteroidetes", "name": "Sphingobacteriia", "group": 15}, {"order": "Burkholderiales", "name": "Comamonadaceae", "group": 16}, {"order": "Burkholderiales", "name": "unclassified Burkholderiales", "group": 17}, {"order": "Burkholderiales", "name": "Oxalobacteraceae", "group": 18}, {"order": "Caulobacterales", "name": "Caulobacteraceae", "group": 19}, {"order": "Chlamydiia", "name": "Chlamydiales", "group": 20}, {"order": "Chlorobi", "name": "Chlorobia", "group": 21}, {"order": "Chromatiales", "name": "Ectothiorhodospiraceae", "group": 22}, {"order": "Clostridia", "name": "Clostridiales", "group": 23}, {"order": "Clostridia", "name": "Thermoanaerobacterales", "group": 24}, {"order": "Cyanobacteria", "name": "Oscillatoriophycideae", "group": 25}, {"order": "Cyanobacteria", "name": "Synechococcales", "group": 26}, {"order": "Cyanobacteria", "name": "Nostocales", "group": 27}, {"order": "Dehalococcoidia", "name": "Dehalococcoidales", "group": 28}, {"order": "Deinococci", "name": "Thermales", "group": 29}, {"order": "Deinococci", "name": "Deinococcales", "group": 30}, {"order": "Deltaproteobacteria", "name": "Desulfovibrionales", "group": 31}, {"order": "Deltaproteobacteria", "name": "Desulfuromonadales", "group": 32}, {"order": "Deltaproteobacteria", "name": "Myxococcales", "group": 33}, {"order": "Deltaproteobacteria", "name": "Desulfobacterales", "group": 34}, {"order": "Enterobacterales", "name": "Yersiniaceae", "group": 35}, {"order": "Enterobacterales", "name": "Hafniaceae", "group": 36}, {"order": "Enterobacterales", "name": "Erwiniaceae", "group": 37}, {"order": "Enterobacterales", "name": "Pectobacteriaceae", "group": 38}, {"order": "Enterobacterales", "name": "Morganellaceae", "group": 39}, {"order": "Fusobacteriales", "name": "Fusobacteriaceae", "group": 40}, {"order": "Legionellales", "name": "Legionellaceae", "group": 41}, {"order": "Leptospirales", "name": "Leptospiraceae", "group": 42}, {"order": "Mollicutes", "name": "Mycoplasmatales", "group": 43}, {"order": "Mollicutes", "name": "Entomoplasmatales", "group": 44}, {"order": "Mollicutes", "name": "Acholeplasmatales", "group": 45}, {"order": "Neisseriales", "name": "Neisseriaceae", "group": 46}, {"order": "Oceanospirillales", "name": "Halomonadaceae", "group": 47}, {"order": "Pasteurellales", "name": "Pasteurellaceae", "group": 48}, {"order": "Planctomycetia", "name": "Planctomycetales", "group": 49}, {"order": "Pseudomonadales", "name": "Moraxellaceae", "group": 50}, {"order": "Rhizobiales", "name": "Rhizobiaceae", "group": 51}, {"order": "Rhizobiales", "name": "Bradyrhizobiaceae", "group": 52}, {"order": "Rhizobiales", "name": "Brucellaceae", "group": 53}, {"order": "Rhizobiales", "name": "Hyphomicrobiaceae", "group": 54}, {"order": "Rhizobiales", "name": "Phyllobacteriaceae", "group": 55}, {"order": "Rhizobiales", "name": "Methylobacteriaceae", "group": 56}, {"order": "Rhizobiales", "name": "Bartonellaceae", "group": 57}, {"order": "Rhodobacterales", "name": "Rhodobacteraceae", "group": 58}, {"order": "Rhodospirillales", "name": "Acetobacteraceae", "group": 59}, {"order": "Rhodospirillales", "name": "Rhodospirillaceae", "group": 60}, {"order": "Rickettsiales", "name": "Anaplasmataceae", "group": 61}, {"order": "Rickettsiales", "name": "Rickettsiaceae", "group": 62}, {"order": "Sphingomonadales", "name": "Sphingomonadaceae", "group": 63}, {"order": "Sphingomonadales", "name": "Erythrobacteraceae", "group": 64}, {"order": "Spirochaetales", "name": "Spirochaetaceae", "group": 65}, {"order": "Spirochaetales", "name": "Borreliaceae", "group": 66}, {"order": "Thermotogales", "name": "Thermotogaceae", "group": 67}, {"order": "Thiotrichales", "name": "Piscirickettsiaceae", "group": 68}, {"order": "Thiotrichales", "name": "Francisellaceae", "group": 69}, {"order": "Vibrionales", "name": "Vibrionaceae", "group": 70}, {"order": "Actinobacteria", "name": "Xanthomonadaceae", "group": 71}, {"name": "clusters_1", "group": 72}, {"name": "clusters_2", "group": 73}, {"name": "clusters_3", "group": 74}, {"name": "clusters_4", "group": 75}, {"name": "clusters_5", "group": 76}, {"name": "clusters_6", "group": 77}, {"name": "clusters_7", "group": 78}, {"name": "clusters_8", "group": 79}, {"name": "clusters_9", "group": 80}, {"name": "clusters_10", "group": 81}, {"name": "clusters_11", "group": 82}, {"name": "clusters_12", "group": 83}], "links": [{"source": 0, "target": 77, "value": 5}, {"source": 0, "target": 74, "value": 7}, {"source": 0, "target": 73, "value": 35}, {"source": 0, "target": 76, "value": 3}, {"source": 0, "target": 72, "value": 22}, {"source": 0, "target": 78, "value": 4}, {"source": 1, "target": 74, "value": 14}, {"source": 1, "target": 73, "value": 14}, {"source": 1, "target": 77, "value": 20}, {"source": 1, "target": 72, "value": 44}, {"source": 2, "target": 77, "value": 37}, {"source": 2, "target": 72, "value": 3}, {"source": 2, "target": 74, "value": 39}, {"source": 3, "target": 77, "value": 5}, {"source": 3, "target": 72, "value": 5}, {"source": 4, "target": 77, "value": 8}, {"source": 4, "target": 72, "value": 10}, {"source": 4, "target": 74, "value": 8}, {"source": 5, "target": 74, "value": 37}, {"source": 5, "target": 77, "value": 2}, {"source": 6, "target": 74, "value": 1}, {"source": 6, "target": 73, "value": 11}, {"source": 6, "target": 77, "value": 1}, {"source": 7, "target": 77, "value": 11}, {"source": 7, "target": 74, "value": 11}, {"source": 7, "target": 78, "value": 2}, {"source": 7, "target": 72, "value": 6}, {"source": 8, "target": 72, "value": 7}, {"source": 8, "target": 78, "value": 1}, {"source": 8, "target": 76, "value": 6}, {"source": 9, "target": 73, "value": 19}, {"source": 9, "target": 76, "value": 3}, {"source": 9, "target": 74, "value": 11}, {"source": 9, "target": 80, "value": 15}, {"source": 10, "target": 74, "value": 10}, {"source": 10, "target": 80, "value": 19}, {"source": 11, "target": 80, "value": 1}, {"source": 11, "target": 74, "value": 9}, {"source": 12, "target": 74, "value": 10}, {"source": 12, "target": 80, "value": 6}, {"source": 12, "target": 73, "value": 60}, {"source": 12, "target": 76, "value": 2}, {"source": 12, "target": 77, "value": 45}, {"source": 12, "target": 75, "value": 16}, {"source": 13, "target": 75, "value": 3}, {"source": 13, "target": 77, "value": 1}, {"source": 13, "target": 74, "value": 6}, {"source": 13, "target": 78, "value": 11}, {"source": 13, "target": 73, "value": 18}, {"source": 13, "target": 72, "value": 20}, {"source": 14, "target": 77, "value": 7}, {"source": 14, "target": 72, "value": 1}, {"source": 14, "target": 78, "value": 2}, {"source": 14, "target": 74, "value": 11}, {"source": 14, "target": 73, "value": 14}, {"source": 15, "target": 74, "value": 4}, {"source": 15, "target": 77, "value": 2}, {"source": 15, "target": 72, "value": 5}, {"source": 15, "target": 78, "value": 1}, {"source": 16, "target": 78, "value": 6}, {"source": 16, "target": 72, "value": 1}, {"source": 16, "target": 77, "value": 10}, {"source": 16, "target": 74, "value": 28}, {"source": 17, "target": 77, "value": 1}, {"source": 17, "target": 78, "value": 1}, {"source": 17, "target": 74, "value": 2}, {"source": 17, "target": 72, "value": 8}, {"source": 18, "target": 78, "value": 2}, {"source": 18, "target": 74, "value": 2}, {"source": 18, "target": 77, "value": 4}, {"source": 18, "target": 72, "value": 17}, {"source": 19, "target": 78, "value": 1}, {"source": 19, "target": 72, "value": 1}, {"source": 19, "target": 77, "value": 12}, {"source": 20, "target": 78, "value": 8}, {"source": 20, "target": 77, "value": 41}, {"source": 20, "target": 72, "value": 17}, {"source": 20, "target": 74, "value": 8}, {"source": 20, "target": 73, "value": 38}, {"source": 20, "target": 76, "value": 9}, {"source": 21, "target": 73, "value": 1}, {"source": 21, "target": 74, "value": 2}, {"source": 21, "target": 77, "value": 8}, {"source": 21, "target": 72, "value": 3}, {"source": 22, "target": 74, "value": 1}, {"source": 22, "target": 73, "value": 2}, {"source": 22, "target": 77, "value": 7}, {"source": 22, "target": 72, "value": 1}, {"source": 23, "target": 74, "value": 48}, {"source": 23, "target": 72, "value": 19}, {"source": 23, "target": 73, "value": 52}, {"source": 23, "target": 78, "value": 4}, {"source": 23, "target": 77, "value": 55}, {"source": 24, "target": 78, "value": 20}, {"source": 24, "target": 72, "value": 1}, {"source": 24, "target": 77, "value": 14}, {"source": 25, "target": 78, "value": 11}, {"source": 25, "target": 77, "value": 1}, {"source": 25, "target": 72, "value": 13}, {"source": 26, "target": 72, "value": 42}, {"source": 26, "target": 78, "value": 15}, {"source": 27, "target": 72, "value": 16}, {"source": 28, "target": 72, "value": 16}, {"source": 28, "target": 78, "value": 8}, {"source": 29, "target": 78, "value": 4}, {"source": 29, "target": 74, "value": 10}, {"source": 30, "target": 74, "value": 1}, {"source": 30, "target": 77, "value": 7}, {"source": 30, "target": 78, "value": 4}, {"source": 30, "target": 73, "value": 1}, {"source": 31, "target": 73, "value": 5}, {"source": 31, "target": 78, "value": 1}, {"source": 31, "target": 72, "value": 1}, {"source": 31, "target": 77, "value": 1}, {"source": 31, "target": 74, "value": 11}, {"source": 32, "target": 78, "value": 7}, {"source": 32, "target": 74, "value": 7}, {"source": 32, "target": 73, "value": 2}, {"source": 32, "target": 77, "value": 2}, {"source": 33, "target": 74, "value": 2}, {"source": 33, "target": 73, "value": 5}, {"source": 33, "target": 79, "value": 2}, {"source": 33, "target": 72, "value": 11}, {"source": 34, "target": 77, "value": 6}, {"source": 34, "target": 72, "value": 1}, {"source": 34, "target": 79, "value": 3}, {"source": 35, "target": 79, "value": 12}, {"source": 35, "target": 72, "value": 6}, {"source": 35, "target": 78, "value": 6}, {"source": 35, "target": 74, "value": 25}, {"source": 35, "target": 77, "value": 5}, {"source": 35, "target": 76, "value": 9}, {"source": 35, "target": 73, "value": 43}, {"source": 36, "target": 76, "value": 2}, {"source": 36, "target": 74, "value": 5}, {"source": 36, "target": 73, "value": 7}, {"source": 36, "target": 77, "value": 1}, {"source": 37, "target": 76, "value": 22}, {"source": 37, "target": 73, "value": 11}, {"source": 37, "target": 74, "value": 19}, {"source": 37, "target": 77, "value": 1}, {"source": 38, "target": 73, "value": 1}, {"source": 38, "target": 76, "value": 1}, {"source": 38, "target": 77, "value": 9}, {"source": 38, "target": 81, "value": 4}, {"source": 38, "target": 72, "value": 7}, {"source": 39, "target": 81, "value": 2}, {"source": 39, "target": 72, "value": 4}, {"source": 39, "target": 77, "value": 20}, {"source": 40, "target": 77, "value": 3}, {"source": 40, "target": 81, "value": 6}, {"source": 40, "target": 72, "value": 10}, {"source": 41, "target": 81, "value": 16}, {"source": 41, "target": 77, "value": 14}, {"source": 41, "target": 72, "value": 43}, {"source": 42, "target": 72, "value": 10}, {"source": 42, "target": 77, "value": 6}, {"source": 42, "target": 78, "value": 1}, {"source": 43, "target": 72, "value": 61}, {"source": 43, "target": 78, "value": 5}, {"source": 43, "target": 82, "value": 44}, {"source": 43, "target": 77, "value": 46}, {"source": 44, "target": 78, "value": 1}, {"source": 44, "target": 72, "value": 1}, {"source": 44, "target": 76, "value": 19}, {"source": 44, "target": 73, "value": 2}, {"source": 44, "target": 83, "value": 1}, {"source": 45, "target": 83, "value": 9}, {"source": 46, "target": 83, "value": 5}, {"source": 46, "target": 77, "value": 2}, {"source": 46, "target": 74, "value": 3}, {"source": 46, "target": 78, "value": 5}, {"source": 46, "target": 72, "value": 83}, {"source": 47, "target": 78, "value": 13}, {"source": 47, "target": 72, "value": 3}, {"source": 47, "target": 77, "value": 5}, {"source": 47, "target": 74, "value": 12}, {"source": 48, "target": 73, "value": 20}, {"source": 48, "target": 78, "value": 14}, {"source": 48, "target": 74, "value": 3}, {"source": 48, "target": 77, "value": 2}, {"source": 48, "target": 76, "value": 63}, {"source": 48, "target": 72, "value": 1}, {"source": 49, "target": 77, "value": 1}, {"source": 49, "target": 72, "value": 11}, {"source": 50, "target": 77, "value": 27}, {"source": 50, "target": 72, "value": 30}, {"source": 50, "target": 74, "value": 43}, {"source": 50, "target": 73, "value": 7}, {"source": 50, "target": 76, "value": 17}, {"source": 51, "target": 72, "value": 15}, {"source": 51, "target": 77, "value": 47}, {"source": 51, "target": 76, "value": 1}, {"source": 51, "target": 73, "value": 26}, {"source": 51, "target": 74, "value": 6}, {"source": 52, "target": 73, "value": 31}, {"source": 53, "target": 73, "value": 2}, {"source": 53, "target": 77, "value": 41}, {"source": 53, "target": 74, "value": 28}, {"source": 53, "target": 76, "value": 5}, {"source": 53, "target": 72, "value": 1}, {"source": 54, "target": 73, "value": 3}, {"source": 54, "target": 76, "value": 4}, {"source": 54, "target": 74, "value": 2}, {"source": 54, "target": 72, "value": 4}, {"source": 55, "target": 72, "value": 14}, {"source": 56, "target": 72, "value": 15}, {"source": 57, "target": 72, "value": 19}, {"source": 57, "target": 77, "value": 3}, {"source": 58, "target": 72, "value": 8}, {"source": 58, "target": 77, "value": 10}, {"source": 58, "target": 74, "value": 2}, {"source": 58, "target": 78, "value": 3}, {"source": 58, "target": 73, "value": 29}, {"source": 58, "target": 76, "value": 7}, {"source": 59, "target": 73, "value": 3}, {"source": 59, "target": 74, "value": 28}, {"source": 59, "target": 77, "value": 5}, {"source": 59, "target": 72, "value": 13}, {"source": 60, "target": 77, "value": 1}, {"source": 60, "target": 72, "value": 18}, {"source": 60, "target": 76, "value": 2}, {"source": 61, "target": 76, "value": 32}, {"source": 62, "target": 76, "value": 9}, {"source": 62, "target": 72, "value": 5}, {"source": 62, "target": 77, "value": 29}, {"source": 62, "target": 74, "value": 8}, {"source": 63, "target": 74, "value": 5}, {"source": 63, "target": 77, "value": 3}, {"source": 63, "target": 73, "value": 26}, {"source": 63, "target": 72, "value": 19}, {"source": 64, "target": 72, "value": 11}, {"source": 64, "target": 77, "value": 1}, {"source": 64, "target": 74, "value": 2}, {"source": 65, "target": 72, "value": 11}, {"source": 65, "target": 77, "value": 5}, {"source": 65, "target": 74, "value": 4}, {"source": 66, "target": 77, "value": 5}, {"source": 66, "target": 76, "value": 6}, {"source": 66, "target": 73, "value": 19}, {"source": 67, "target": 77, "value": 3}, {"source": 67, "target": 72, "value": 17}, {"source": 68, "target": 77, "value": 1}, {"source": 68, "target": 72, "value": 23}, {"source": 69, "target": 77, "value": 1}, {"source": 69, "target": 72, "value": 60}, {"source": 70, "target": 77, "value": 89}, {"source": 70, "target": 78, "value": 5}, {"source": 70, "target": 73, "value": 26}, {"source": 70, "target": 76, "value": 1}, {"source": 71, "target": 73, "value": 1}, {"source": 71, "target": 77, "value": 35}, {"source": 71, "target": 74, "value": 16}, {"source": 71, "target": 72, "value": 75}, {"source": 71, "target": 78, "value": 1}]};
+  // List of node names
+  const allNodes = data.nodes.map((d) => d.name);
+
+  // List of groups
+  let allGroups = data.nodes.map((d) => d.order);
+  allGroups = [...new Set(allGroups)];
+
+  // A color scale for groups:
+  const color = d3.scaleOrdinal().domain(allGroups).range(d3.schemeSet3);
+
+  // A linear scale for node size
+  const size = d3.scaleLinear().domain([1, 10]).range([0.5, 8]);
+
+  // A linear scale to position the nodes on the X axis
+  const x = d3.scalePoint().range([0, width]).domain(allNodes);
+
+  // In my input data, links are provided between nodes -id-, NOT between node names.
+  // So I have to do a link between this id and the name
+  const idToNode = {};
+  data.nodes.forEach(function (n) {
+    idToNode[n.group] = n;
+  });
+
+  // Add the links
+  const links = svg
+    .selectAll("mylinks")
+    .data(data.links)
+    .join("path")
+    .attr("d", (d) => {
+      start = x(idToNode[d.source].name); // X position of start node on the X axis
+      end = x(idToNode[d.target].name); // X position of end node
+      return [
+        "M",
+        start,
+        height - 30, // the arc starts at the coordinate x=start, y=height-30 (where the starting node is)
+        "A", // This means we're gonna build an elliptical arc
+        (start - end) / 2,
+        ",", // Next 2 lines are the coordinates of the inflexion point. Height of this point is proportional with start - end distance
+        (start - end) / 2,
+        0,
+        0,
+        ",",
+        start < end ? 1 : 0,
+        end,
+        ",",
+        height - 30,
+      ] // We always want the arc on top. So if end is before start, putting 0 here turn the arc upside down.
+        .join(" ");
+    })
+    .style("fill", "none")
+    .style("stroke-opacity", 0.8)
+    .attr("stroke", "grey")
+    .style("stroke-width", (d) => { return d.value/1.8});
+
+  // Add the circle for the nodes
+  const nodes = svg
+    .selectAll("mynodes")
+    .data(
+      data.nodes.sort((a, b) => {
+        +b.n - +a.n;
+      })
+    )
+    .join("circle")
+    .attr("cx", (d) => x(d.name))
+    .attr("cy", height - 30)
+    .attr("r", (d) => 8)
+    .style("fill", (d) => color(d.group))
+    .attr("stroke", "white");
+
+  // And give them a label
+  const labels = svg
+    .selectAll("mylabels")
+    .data(data.nodes)
+    .join("text")
+    .attr("x", 0)
+    .attr("y", 0)
+    .text((d) => d.name)
+    .style("text-anchor", "end")
+    .attr(
+      "transform",
+      (d) => "translate(" + (x(d.name)) + "," + (height-15) + ")rotate(-90)"
+    )
+    .style("font-size", 10);
+  // Add the highlighting functionality
+  nodes
+    .on("mouseover", function (event, d) {
+      // Highlight the nodes: every node is green except of him
+      nodes.style("opacity", 0.2);
+      d3.select(this).style("opacity", 1);
+      // Highlight the connections
+      links
+        .style("stroke", (a) =>
+          a.source === d.group || a.target === d.group ? color(d.order) : "#b8b8b8"
+        )
+        .style("stroke-opacity", (a) =>
+          a.source === d.group || a.target === d.group ? 1 : 0.2
+        )
+        .style("stroke-width", (a) =>
+          a.source === d.group || a.target === d.group ? (d) => { return d.value/1.8} : 1
+        );
+      labels.style("font-size", (b) => (b.name === d.name ? 11 : 8));
+    })
+    .on("mouseout", (d) => {
+      nodes.style("opacity", 1);
+      links
+        .style("stroke", "grey")
+        .style("stroke-opacity", 0.8)
+        .style("stroke-width", (d) => { return d.value/1.8});
+      labels.style("font-size", 10);
+    });
+//});
+ </script>
